@@ -1,0 +1,18 @@
+﻿<style>
+    .notification{
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+    }
+    .btn-close-delete{
+        position: absolute;
+        bottom: 50px;
+        right: 50px;
+    }
+</style>
+<div class="notification">
+    <span class="message">Person @ViewBag.UserName was removed from the list successfully!</span>
+    <a asp-controller="Rookies" asp-action="Index" class="btn btn-danger btn-close-delete">Go Back</a>
+</div>

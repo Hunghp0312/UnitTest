@@ -1,0 +1,228 @@
+﻿@model Person
+
+@{
+    ViewData["Title"] = Model?.Id > 0 ? "Edit Person" : "Create Person";
+}
+
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-light: #93c5fd;
+        --dark: #1e293b;
+        --light: #f8fafc;
+        --success: #22c55e;
+        --danger: #ef4444;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background-color: #f1f5f9;
+        color: var(--dark);
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    h1 {
+        margin-bottom: 10px;
+    }
+
+    .form-container {
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: var(--dark);
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="date"],
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        margin-right: 10px;
+        width: 18px;
+        height: 18px;
+    }
+
+    .checkbox-group label {
+        margin-bottom: 0;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2563eb;
+    }
+
+    .btn-secondary {
+        background-color: #e2e8f0;
+        color: var(--dark);
+    }
+
+    .btn-secondary:hover {
+        background-color: #cbd5e1;
+    }
+
+    .btn-danger {
+        background-color: red;
+        color: white;
+    }
+    .btn-danger:hover{
+        background-color: orangered;
+    }
+
+    .field-validation-error {
+        color: var(--danger);
+        font-size: 0.875rem;
+        margin-top: 5px;
+        display: block;
+    }
+
+        .input-validation-error {
+        border-color: var(--danger);
+    }
+
+</style>
+
+<div class="container">
+    <header style="display:flex; align-items:center; justify-content:space-between">
+        <div>
+            <h1>@ViewData["Title"]</h1>
+            <p>Enter person information</p>
+        </div>
+        
+        @if (@Model?.Id > 0)
+        {
+            <a asp-action="Delete" asp-controller="Rookies" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+        }
+    </header>
+
+    <div class="form-container">
+        <form asp-action="@(Model?.Id > 0 ? "Update":"Create")" asp-controller="Rookies" method="post">
+            @if (Model?.Id > 0)
+            {
+                <input type="hidden" asp-for="Id" />
+            }
+
+            <div class="form-group">
+                <label asp-for="FirstName">First Name</label>
+                <input asp-for="FirstName" type="text" class="form-control" />
+                <span asp-validation-for="FirstName" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LastName">Last Name</label>
+                <input asp-for="LastName" type="text" class="form-control" />
+                <span asp-validation-for="LastName" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Gender">Gender</label>
+                <select asp-for="Gender" class="form-control">
+                    <option value="@GenderType.Male">Male</option>
+                    <option value="@GenderType.Female">Female</option>
+                    <option value="@GenderType.Other">Other</option>
+                </select>
+                <span asp-validation-for="Gender" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DateOfBirth">Date of Birth</label>
+                <input asp-for="DateOfBirth" type="date" class="form-control" />
+                <span asp-validation-for="DateOfBirth" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PhoneNumber">Phone Number</label>
+                <input asp-for="PhoneNumber" type="tel" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="BirthPlace">Birth Place</label>
+                <input asp-for="BirthPlace" type="text" class="form-control" />
+                <span asp-validation-for="BirthPlace" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input asp-for="IsGraduated" type="checkbox" />
+                    <label asp-for="IsGraduated">Is Graduated</label>
+                </div>
+                <span asp-validation-for="IsGraduated" class="field-validation-error"></span>
+            </div>
+
+            <div class="button-group">
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

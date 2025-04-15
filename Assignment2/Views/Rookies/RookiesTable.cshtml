@@ -1,0 +1,65 @@
+﻿@model PersonViewModel
+
+@{
+    ViewData["Title"] = "Person Information";
+}
+<style>
+
+    .btn-disable {
+        pointer-events: none;
+        cursor: default;
+        background-color: #FFFFF0;
+    }
+</style>
+
+
+<div class="container">
+    <header>
+        <h1>Person Information</h1>
+        <p>Database of registered individuals</p>
+    </header>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Full Name</th>
+                    <th>Gender</th>
+                    <th>Date of Birth</th>
+                    <th>Phone Number</th>
+                    <th>Birth Place</th>
+                    <th>Graduated</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var person in Model.People)
+                {
+                    <tr>
+                        <td>@person.Id</td>
+                        <td>@person.FirstName</td>
+                        <td>@person.LastName</td>
+                        <td><a class="nav-link text-dark" asp-area="" asp-controller="Rookies" asp-action="Update" asp-route-id="@person.Id" style="text-decoration:underline">@person.FullName</a></td>
+                        <td>@person.Gender</td>
+                        <td>@person.DateOfBirthString</td>
+                        <td>@person.PhoneNumber</td>
+                        <td>@person.BirthPlace</td>
+                        <td>@person.GraduatedString</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <a asp-controller="Rookies"
+           asp-action="@ViewBag.Action"
+           asp-route-pageSize="@Model.PageSize"
+           asp-route-pageIndex="@(Model.PageIndex - 1)"
+           class="btn btn-primary @((Model.PageIndex == 1)?"btn-disable": "")">Prev</a>
+        <a asp-controller="Rookies" asp-action="@ViewBag.Action"
+           asp-route-pageSize="@Model.PageSize"
+           asp-route-pageIndex="@(Model.PageIndex + 1)"
+           class="btn btn-primary @((Model.PageIndex == Model.TotalPage)?"btn-disable": "")">Next</a>
+        <div>Page @Model.PageIndex</div>
+    </div>
+</div>
