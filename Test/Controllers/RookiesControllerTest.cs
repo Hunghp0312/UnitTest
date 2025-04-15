@@ -5,9 +5,8 @@ using Assignment2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Assignment2.ViewModels;
 using Assignment.CustomException;
-using DocumentFormat.OpenXml.Office2010.Excel;
 
-namespace Test;
+namespace Test.Controllers;
 
 [TestFixture]
 public class RookiesControllerTests
@@ -46,8 +45,11 @@ public class RookiesControllerTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.ViewName, Is.EqualTo("RookiesTable"));
-        Assert.That(result.Model, Is.EqualTo(mockViewModel));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ViewName, Is.EqualTo("RookiesTable"));
+            Assert.That(result.Model, Is.EqualTo(mockViewModel));
+        });
     }
 
     [Test]
@@ -61,15 +63,20 @@ public class RookiesControllerTests
             PageIndex = 1,
             TotalPage = 1
         };
-        _mockPersonService.Setup(s => s.GetByFilter(It.Is<Func<Person, bool>>(f => f(new Person { Gender = GenderType.Male })), 5, 1)).Returns(mockViewModel);
+        _mockPersonService.Setup(s => s.GetByFilter(It.Is<Func<Person, bool>>(
+            f => f(new Person { Gender = GenderType.Male }))
+            , 5, 1)).Returns(mockViewModel);
 
         // Act
         var result = _controller.MalePerson(5, 1) as ViewResult;
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.ViewName, Is.EqualTo("RookiesTable"));
-        Assert.That(result.Model, Is.EqualTo(mockViewModel));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ViewName, Is.EqualTo("RookiesTable"));
+            Assert.That(result.Model, Is.EqualTo(mockViewModel));
+        });
     }
 
     [Test]
@@ -90,8 +97,11 @@ public class RookiesControllerTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.ViewName, Is.EqualTo("RookiesTable"));
-        Assert.That(result.Model, Is.EqualTo(oldestPerson));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ViewName, Is.EqualTo("RookiesTable"));
+            Assert.That(result.Model, Is.EqualTo(oldestPerson));
+        });
     }
 
     [Test]
@@ -148,8 +158,8 @@ public class RookiesControllerTests
         // Arrange
         var person = new Person
         {
-            FirstName = "John",
-            LastName = "Doe",
+            FirstName = "Hung",
+            LastName = "Hoang",
             DateOfBirth = new DateTime(2000, 12, 03),
             BirthPlace = "Cao Bang",
             Gender = GenderType.Male,
@@ -190,8 +200,8 @@ public class RookiesControllerTests
         // Arrange
         var person = new Person
         {
-            FirstName = "John",
-            LastName = "Doe",
+            FirstName = "Hung",
+            LastName = "Hoang",
             DateOfBirth = new DateTime(2000, 12, 03),
             BirthPlace = "Cao Bang",
             Gender = GenderType.Male,
@@ -272,7 +282,7 @@ public class RookiesControllerTests
         });
     }
     [Test]
-    public void RedirectByYear_ActionIsNull_ReturnsBadRequest()
+    public void RedirectByYear_ActionIsEmpty_ReturnsBadRequest()
     {
         // Act
         var result = _controller.RedirectByYear("");
@@ -340,22 +350,23 @@ public class RookiesControllerTests
     }
 
     [Test]
-    public void PersonBirthYearLess2000_ReturnsCorrectViewAndData()
+    public void PersonBirthYearLess2000_Valid_ReturnsCorrectViewAndData()
     {
         // Arrange
-
         var mockPeople = new PersonViewModel
         {
-            People = new List<Person> {
+            People = [
                 new Person { FirstName = "John", LastName = "Hoang", DateOfBirth = new DateTime(1995, 1, 1) },
                 new Person { FirstName = "Jane", LastName = "Hoang", DateOfBirth = new DateTime(1988, 5, 10) }
-            },
+            ],
             PageSize = 5,
             PageIndex = 1,
             TotalPage = 1
         };
         _mockPersonService
-            .Setup(service => service.GetByFilter(It.IsAny<Func<Person, bool>>(), 5, 1))
+            .Setup(service => service.GetByFilter(It.Is<Func<Person, bool>>(
+                f => f(new Person { DateOfBirth = new DateTime(1995, 1, 1) }) 
+            && !f(new Person { DateOfBirth = new DateTime(2001, 1, 1) })), 5, 1))
             .Returns(mockPeople);
 
         // Act
@@ -372,22 +383,24 @@ public class RookiesControllerTests
     }
 
     [Test]
-    public void PersonBirthYearGreater2000_ReturnsCorrectViewAndData()
+    public void PersonBirthYearGreater2000_Valid_ReturnsCorrectViewAndData()
     {
         // Arrange
-
         var mockPeople = new PersonViewModel
         {
-            People = new List<Person> {
+            People = [
                 new Person { FirstName = "John", DateOfBirth = new DateTime(2005, 1, 1) },
-                new Person { FirstName = "Jane", DateOfBirth = new DateTime(1008, 5, 10) }
-            },
+                new Person { FirstName = "Jane", DateOfBirth = new DateTime(2008, 5, 10) }
+            ],
             PageSize = 5,
             PageIndex = 1,
             TotalPage = 1
         };
         _mockPersonService
-            .Setup(service => service.GetByFilter(It.IsAny<Func<Person, bool>>(), 5, 1))
+            .Setup(service => service.GetByFilter(It.Is<Func<Person, bool>>(f =>
+                f(new Person { DateOfBirth = new DateTime(2005, 1, 1) }) &&  // true: year < 2000
+                f(new Person { DateOfBirth = new DateTime(2008, 5, 10) })     // false: year > 2000
+            ), 5, 1))
             .Returns(mockPeople);
 
         // Act
@@ -404,21 +417,24 @@ public class RookiesControllerTests
     }
 
     [Test]
-    public void PersonBirthYearEqual2000_ReturnsCorrectViewAndData()
+    public void PersonBirthYearEqual2000_Valid_ReturnsCorrectViewAndData()
     {
         // Arrange
         var mockPeople = new PersonViewModel
         {
-            People = new List<Person> {
+            People = [
                 new Person { FirstName = "John", DateOfBirth = new DateTime(2000, 1, 1) },
                 new Person { FirstName = "Jane", DateOfBirth = new DateTime(2000, 5, 10) }
-            },
+            ],
             PageSize = 5,
             PageIndex = 1,
             TotalPage = 1
         };
         _mockPersonService
-            .Setup(service => service.GetByFilter(It.IsAny<Func<Person, bool>>(), 5, 1))
+            .Setup(service => service.GetByFilter(It.Is<Func<Person, bool>>(f =>
+                f(new Person { DateOfBirth = new DateTime(2000, 1, 1) }) &&  
+                f(new Person { DateOfBirth = new DateTime(2000, 5, 10) })     
+            ), 5, 1))
             .Returns(mockPeople);
 
         // Act
